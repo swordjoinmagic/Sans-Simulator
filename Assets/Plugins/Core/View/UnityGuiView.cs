@@ -205,7 +205,7 @@ namespace uMVVM {
         /// 开始显示时进行的操作
         /// </summary>
         /// <param name="immediate"></param>
-        private void OnHide(bool immediate) {
+        public void OnHide(bool immediate) {
             BindingContext.OnStartHide();
 
             if (immediate) {

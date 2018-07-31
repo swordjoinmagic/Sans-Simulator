@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using uMVVM;
 
-class FightViewModel : ViewModelBase{
+public class FightViewModel : ViewModelBase{
     public BindableProperty<bool> isActived = new BindableProperty<bool>();
 
     public FightViewModel() {

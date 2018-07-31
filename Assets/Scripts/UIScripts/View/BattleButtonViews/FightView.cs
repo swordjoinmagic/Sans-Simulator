@@ -8,12 +8,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(EventTrigger))]
-class FightView : UnityGuiView<FightViewModel>{
+public class FightView : UnityGuiView<FightViewModel> {
 
     //===================================
     // 此View管理的控件
-    new CanvasGroup canvasGroup;
+    CanvasGroup cG;
     public Selectable forcus;
+    public AudioSource clickAudio;
     private EventTrigger eventTrigger;
 
     private void Awake() {
@@ -26,25 +27,33 @@ class FightView : UnityGuiView<FightViewModel>{
     }
 
     private void Start() {
-        canvasGroup = GetComponent<CanvasGroup>();
+        cG = GetComponent<CanvasGroup>();
     }
 
     protected override void OnInitialize() {
         base.OnInitialize();
 
-        binder.Add<bool>("isActived",OnActivedChanged);
+        binder.Add<bool>("isActived", OnActivedChanged);
 
         // 为EventTrigger注册事件
         EventTrigger.Entry entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.Submit;
-        entry.callback.AddListener(eventData => { print("单击了选择战斗按钮"); });
+        entry.callback.AddListener(eventData => Attack());
 
         eventTrigger.triggers.Add(entry);
     }
 
-    private void OnActivedChanged(bool oldValue,bool newValue) {
-        canvasGroup.interactable = newValue;
+    private void OnActivedChanged(bool oldValue, bool newValue) {
+        cG.interactable = newValue;
         if (newValue) forcus.Select();
+        else Hide(immediate: true);
+    }
+
+    private void Attack() {
+        // 播放声音
+        clickAudio.Play();
+        // 设置当前面板的可活动性为false
+        BindingContext.isActived.Value = false;
     }
 }
 
