@@ -14,7 +14,7 @@ public class FightView : UnityGuiView<FightViewModel> {
     // 此View管理的控件
     CanvasGroup cG;
     public Selectable forcus;
-    public AudioSource clickAudio;
+    public AudioManagement AudioManagement;
     private EventTrigger eventTrigger;
 
     private void Awake() {
@@ -49,11 +49,15 @@ public class FightView : UnityGuiView<FightViewModel> {
         else Hide(immediate: true);
     }
 
+    // Submit事件函数
     private void Attack() {
         // 播放声音
-        clickAudio.Play();
+        AudioManagement.Audios["menuselect"].Play();
         // 设置当前面板的可活动性为false
         BindingContext.isActived.Value = false;
+        // 播放攻击动画,同时敌人受伤
+        MessageAggregator<int>.Instance.Publish("SansInjured",this,null);
+        // 玩家本回合结束
     }
 }
 

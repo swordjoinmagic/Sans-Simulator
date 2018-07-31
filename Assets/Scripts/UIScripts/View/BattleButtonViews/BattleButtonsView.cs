@@ -14,8 +14,7 @@ public class BattleButtonsView : UnityGuiView<BattleButtonsViewModel>{
     public Button moveButton;
     public Button itemButton;
     public Button mercyButton;
-    public AudioSource selectAudio;
-    public AudioSource clickAudio;
+    public AudioManagement audioManagement;
     private EventTrigger eventTriggerFightButton;
     private EventTrigger eventTriggerMoveButton;
     private EventTrigger eventTriggerItemButton;
@@ -69,7 +68,7 @@ public class BattleButtonsView : UnityGuiView<BattleButtonsViewModel>{
         // 首先将当前CanvasGroup的interactable设为false
         cG.interactable = false;
         // 发出声音
-        clickAudio.Play();
+        audioManagement.Audios["menuselect"].Play();
         // 显示FightView
         fightView.Reveal(immediate:true);
         // 然后发布消息,让订阅该消息的FightViewModele处理,
@@ -78,7 +77,7 @@ public class BattleButtonsView : UnityGuiView<BattleButtonsViewModel>{
     }
 
     private void OnSelectButton() {
-        selectAudio.Play();
+        audioManagement.Audios["menucursor"].Play();
     }
 }
 

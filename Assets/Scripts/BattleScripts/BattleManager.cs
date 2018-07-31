@@ -7,6 +7,16 @@ public class BattleManager : MonoBehaviour {
     public BattleView battleView;
     public BattleMessageView messageView;
     public BattleButtonsView battleButtonsView;
+    public EnemyMessageView enemyMessageView;
+
+    // Boss的数据模型
+    private MonsterViewModel Sans = new MonsterViewModel(hp:20,attack:1);
+    // Boss的动画模型
+    public Animator sansAnimator;
+    // chara攻击的动画模型
+    public Animator charaAnimator;
+    // Boss闪躲的动画
+    public Animation sansDodgeAnimation;
 
     // 回合数
     private int rounds = 0;
@@ -14,7 +24,15 @@ public class BattleManager : MonoBehaviour {
     private bool isPlayerMoveOver = false;
     // 敌人是否行动结束
     private bool isEnermyMoveOver = false;
+    // sans本回合是否受到攻击
+    private bool isSansInjrued = false;
 
+    /// <summary>
+    /// 初始化工作
+    /// </summary>
+    private void Awake() {
+        Sans.HP.OnValueChange += OnSansInjured;
+    }
 
     // 回合开始
     private IEnumerator StartOfRound() {
@@ -48,7 +66,7 @@ public class BattleManager : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator WaitForPlayerMoveOver() {
         while (!isPlayerMoveOver) {
-            yield return new WaitForFixedUpdate();
+            yield return null;
         }
     }
 
@@ -62,10 +80,9 @@ public class BattleManager : MonoBehaviour {
         yield return WaitForPlayerMoveOver();
     }
 
-
     private IEnumerator WaitForEnemyMoveOver() {
         while (!isEnermyMoveOver) {
-            yield return new WaitForFixedUpdate();
+            yield return null;
         }
     }
     /// <summary>
@@ -73,24 +90,52 @@ public class BattleManager : MonoBehaviour {
     /// </summary>
     /// <returns></returns>
     private IEnumerator EnemyTurnedPrepare() {
+        // 如果本回合Sans受到伤害,那么他就开始讲骚话
+        if (isSansInjrued) {
+
+            yield return new WaitForSeconds(2f);
+
+            if (enemyMessageView.BindingContext == null) enemyMessageView.BindingContext = new EnemyMessageViewModel();
+            enemyMessageView.Reveal();
+
+            yield return new WaitForSeconds(0.4f);
+
+            // 说骚话
+            enemyMessageView.BindingContext.message.Value = "怎么? 你觉得我会待在这里乖乖承受?";
+
+            
+        }
         yield return null;
     }
 
     IEnumerator Main() {
+        while (true) {
+            // 重置属性
+            isSansInjrued = false;
+            isPlayerMoveOver = false;
+            isEnermyMoveOver = false;
+            // 回合开始
+            yield return StartOfRound();
 
-        // 回合开始
-        yield return StartOfRound();
+            // 回合前准备
+            yield return BattlePrepare();
 
-        // 回合前准备
-        yield return BattlePrepare();
+            // 玩家回合
+            yield return PlayerTurned();
 
-        // 玩家回合
-        yield return PlayerTurned();
-
-
+            // 敌人回合预执行
+            yield return EnemyTurnedPrepare();
+        }
     }
 
     private void Start() {
         StartCoroutine(Main());
+    }
+
+    private void OnSansInjured(int oldValue,int newValue) {
+        sansDodgeAnimation.Play();
+        charaAnimator.SetTrigger("IsAttack");
+        isPlayerMoveOver = true;
+        isSansInjrued = true;
     }
 }
