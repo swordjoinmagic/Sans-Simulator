@@ -27,7 +27,7 @@ public class PlayerManager : MonoBehaviour {
                 h = 0;
             if (isCollidRight && h > 0)
                 h = 0;
-            transform.Translate(new Vector3(h, v, 0) * Time.deltaTime * 3);
+            transform.Translate(new Vector3(h, v, 0) * Time.deltaTime * 5);
         }
     }
 

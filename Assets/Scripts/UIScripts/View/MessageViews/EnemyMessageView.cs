@@ -21,7 +21,7 @@ public class EnemyMessageView : UnityGuiView<EnemyMessageViewModel>{
     }
 
     private void OnMessageChanged(string oldValue,string newValue) {
-        StartCoroutine(UITypeWriterUtli.WordFade(messageText,newValue,2f, audioManagement.Audios["sans"]));
+        StartCoroutine(UITypeWriterUtli.WordFade(messageText,newValue,1f, audioManagement.Audios["sans"]));
     }
 
     protected override void StartAnimatedReveal() {

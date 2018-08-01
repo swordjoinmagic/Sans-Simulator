@@ -8,7 +8,7 @@ public class BattleManager : MonoBehaviour {
     public BattleMessageView messageView;
     public BattleButtonsView battleButtonsView;
     public EnemyMessageView enemyMessageView;
-
+    public AudioManagement audioManagement;
     // Boss的数据模型
     private MonsterViewModel Sans = new MonsterViewModel(hp:20,attack:1);
     // Boss的动画模型
@@ -80,11 +80,6 @@ public class BattleManager : MonoBehaviour {
         yield return WaitForPlayerMoveOver();
     }
 
-    private IEnumerator WaitForEnemyMoveOver() {
-        while (!isEnermyMoveOver) {
-            yield return null;
-        }
-    }
     /// <summary>
     /// 敌人回合预执行，执行一些在敌人回合开始之前要进行的必要操作，比如说话之类的
     /// </summary>
@@ -93,23 +88,37 @@ public class BattleManager : MonoBehaviour {
         // 如果本回合Sans受到伤害,那么他就开始讲骚话
         if (isSansInjrued) {
 
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1f);
 
             if (enemyMessageView.BindingContext == null) enemyMessageView.BindingContext = new EnemyMessageViewModel();
             enemyMessageView.Reveal();
 
-            yield return new WaitForSeconds(0.4f);
+            //yield return new WaitForSeconds(0.2f);
 
             // 说骚话
-            enemyMessageView.BindingContext.message.Value = "怎么? 你觉得我会待在这里乖乖承受?";
-
-            
+            switch (Sans.HP.Value) {
+                case 19:
+                    sansAnimator.SetBool("IsIDLE",false);
+                    sansAnimator.SetBool("IsLaugh",true);
+                    enemyMessageView.BindingContext.message.Value = "怎么? 你觉得我会待在这里乖乖承受?";
+                    break;
+                default:
+                    break;
+            }
         }
         yield return null;
     }
 
+    /// <summary>
+    /// 敌人回合开始
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator EnemyTurned() {
+
+        yield return null;
+    }
     IEnumerator Main() {
-        while (true) {
+        while (!Sans.IsDied()) {
             // 重置属性
             isSansInjrued = false;
             isPlayerMoveOver = false;
@@ -125,6 +134,9 @@ public class BattleManager : MonoBehaviour {
 
             // 敌人回合预执行
             yield return EnemyTurnedPrepare();
+
+            // 敌人回合开始
+            yield return EnemyTurned();
         }
     }
 
@@ -135,6 +147,8 @@ public class BattleManager : MonoBehaviour {
     private void OnSansInjured(int oldValue,int newValue) {
         sansDodgeAnimation.Play();
         charaAnimator.SetTrigger("IsAttack");
+        
+        audioManagement.Audios["playerfight"].Play();
         isPlayerMoveOver = true;
         isSansInjrued = true;
     }

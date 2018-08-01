@@ -17,5 +17,9 @@ class MonsterViewModel : ViewModelBase{
     }
 
 
+    public bool IsDied() {
+        return HP.Value <= 0 ? true : false;
+    }
+
 }
 

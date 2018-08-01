@@ -11,7 +11,7 @@ public class HPViewModel : ViewModelBase{
 
     public void Init(HPModel hPModel) {
         MaxHp.Value = hPModel.maxHp;
-        HP.Value = hPModel.hp;
+        HP.Value = hPModel.Hp;
     }
 }
 
