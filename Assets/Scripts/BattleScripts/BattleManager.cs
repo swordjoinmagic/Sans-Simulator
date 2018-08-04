@@ -1,7 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using DG.Tweening;
 
+/// <summary>
+/// 管理整个UT的战斗流程
+/// </summary>
 public class BattleManager : MonoBehaviour {
 
     public BattleView battleView;
@@ -31,11 +36,13 @@ public class BattleManager : MonoBehaviour {
     /// 初始化工作
     /// </summary>
     private void Awake() {
+        print("脚本初始化");
         Sans.HP.OnValueChange += OnSansInjured;
     }
 
     // 回合开始
     private IEnumerator StartOfRound() {
+        print("回合开始");
         rounds += 1;
         yield return null;
     }
@@ -44,19 +51,30 @@ public class BattleManager : MonoBehaviour {
     /// 战斗开始前的准备,执行显示信息等操作
     /// </summary>
     private IEnumerator BattlePrepare() {
-        // 隐藏battleView
-        battleView.OnHidden();
-
-        yield return new WaitForSeconds(0.7f);
-
         if (messageView.BindingContext == null) {
             messageView.BindingContext = new BattleMessageViewModel();
         }
 
+        // 将battleView形变
+        battleView.gameObject.GetComponent<RectTransform>().DOSizeDelta(new Vector2(746.9f, 182.6f), 0.5f);
+
+        yield return new WaitForSeconds(0.7f);
+
         // 显示messageView
         messageView.Reveal(immediate: true);
 
-        messageView.BindingContext.Message.Value = "你感觉你可能要吃点苦头了.....";
+        switch (rounds) {
+            case 1:
+                messageView.BindingContext.Message.Value = "你感觉你可能要吃点苦头了.....";
+                break;
+            case 2:
+                messageView.BindingContext.Message.Value = "罪恶爬上了你的脊背....";
+                break;
+            default:
+                messageView.BindingContext.Message.Value = "现在不是读这段文字的时候";
+                break;
+        }
+        
 
     }
 
@@ -68,6 +86,8 @@ public class BattleManager : MonoBehaviour {
         while (!isPlayerMoveOver) {
             yield return null;
         }
+        // 当玩家行动结束时,设置行动框的actived为false
+        battleButtonsView.BindingContext.isActive.Value = false;
     }
 
     /// <summary>
@@ -76,8 +96,16 @@ public class BattleManager : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator PlayerTurned() {
         if (battleButtonsView.BindingContext == null) battleButtonsView.BindingContext = new BattleButtonsViewModel();
+
         battleButtonsView.BindingContext.isActive.Value = true;
+
+        // 等待玩家行动结束
         yield return WaitForPlayerMoveOver();
+
+        // 清空提示信息
+        messageView.BindingContext.Message.Value = "";
+        // 隐藏提示信息窗口
+        messageView.Hide();
     }
 
     /// <summary>
@@ -91,20 +119,28 @@ public class BattleManager : MonoBehaviour {
             yield return new WaitForSeconds(1f);
 
             if (enemyMessageView.BindingContext == null) enemyMessageView.BindingContext = new EnemyMessageViewModel();
+
             enemyMessageView.Reveal();
 
-            //yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.2f);
 
             // 说骚话
             switch (Sans.HP.Value) {
                 case 19:
-                    sansAnimator.SetBool("IsIDLE",false);
                     sansAnimator.SetBool("IsLaugh",true);
                     enemyMessageView.BindingContext.message.Value = "怎么? 你觉得我会待在这里乖乖承受?";
+                    yield return WaitInputUtil.WaitForPlayerInput(KeyCode.Z);
+                    sansAnimator.SetBool("IsLaugh", false);
                     break;
                 default:
+                    enemyMessageView.BindingContext.message.Value = "老实说,这让我提不起劲...";
+                    yield return WaitInputUtil.WaitForPlayerInput(KeyCode.Z);
                     break;
             }
+
+            // 等待说话结束
+            enemyMessageView.BindingContext.message.Value = "";     // 清空
+            //yield return new WaitForSeconds(1f);
         }
         yield return null;
     }
@@ -115,14 +151,31 @@ public class BattleManager : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator EnemyTurned() {
 
+        // 在这里根据sans的血量决定出招,
+        // 每一次出招弹幕躲避框的大小都会改变,
+
+        // 隐藏对于主角的提示窗口
+        messageView.Hide();
+        // 隐藏敌人对话窗口
+        enemyMessageView.Hide();
+        // 将弹幕躲避窗口还原
+        battleView.gameObject.GetComponent<RectTransform>().DOSizeDelta(new Vector2(596.45f, 366.4f),0.5f);
+        yield return new WaitForSeconds(0.5f);
+
+
         yield return null;
     }
-    IEnumerator Main() {
+    IEnumerator _Main() {
+        //yield return null;
         while (!Sans.IsDied()) {
+
+            print("Main执行了1次");
+
             // 重置属性
             isSansInjrued = false;
             isPlayerMoveOver = false;
             isEnermyMoveOver = false;
+
             // 回合开始
             yield return StartOfRound();
 
@@ -141,7 +194,8 @@ public class BattleManager : MonoBehaviour {
     }
 
     private void Start() {
-        StartCoroutine(Main());
+        print("开始协程调用");
+        StartCoroutine(_Main());
     }
 
     private void OnSansInjured(int oldValue,int newValue) {

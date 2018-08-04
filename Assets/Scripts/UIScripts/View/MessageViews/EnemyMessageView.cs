@@ -25,6 +25,7 @@ public class EnemyMessageView : UnityGuiView<EnemyMessageViewModel>{
     }
 
     protected override void StartAnimatedReveal() {
+        canvasGroup.alpha = 1;
         am.Play();
     }
 }

@@ -54,6 +54,7 @@ public class BattleButtonsView : UnityGuiView<BattleButtonsViewModel>{
     }
 
     private void OnActiveChanged(bool oldValue,bool newValue) {
+        print("按钮面板的Active改变,新值是:"+newValue);
         cG.interactable = newValue;
         if (newValue) {
             print("battleButtonView的Actied改变,同时,自动选择fightButton");

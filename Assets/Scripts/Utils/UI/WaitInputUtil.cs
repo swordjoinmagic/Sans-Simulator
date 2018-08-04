@@ -10,7 +10,7 @@ class WaitInputUtil {
     /// </summary>
     /// <param name="keyCode"></param>
     /// <returns></returns>
-    public IEnumerator WaitForPlayerInput(KeyCode keyCode) {
+    public static IEnumerator WaitForPlayerInput(KeyCode keyCode) {
         while (true) {
             bool isInput = Input.GetKeyDown(keyCode);
             if (isInput)
