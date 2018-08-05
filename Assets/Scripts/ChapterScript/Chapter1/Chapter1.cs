@@ -14,7 +14,7 @@ public class Chapter1 : MonoBehaviour,IChapter {
     public IEnumerator Main() {
         print("关卡Main开始");
         print("Left.transform.position.x:"+ Left.transform.position.x);
-        while (Left.transform.position.x < 4.5) {
+        while (Left.transform.position.x < 20) {
             Right.transform.Translate(new Vector2(-Speed, 0));
             Left.transform.Translate(new Vector2(Speed, 0));
             yield return new WaitForSeconds(0.02f);

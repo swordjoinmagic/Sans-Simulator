@@ -32,10 +32,17 @@ public class BattleManager : MonoBehaviour {
     // sans本回合是否受到攻击
     private bool isSansInjrued = false;
 
+    // 关卡预制体
+    private GameObject Chapter1;
+
     /// <summary>
     /// 初始化工作
     /// </summary>
     private void Awake() {
+
+        // 读取关卡预制体
+        Chapter1 = Resources.Load("Prefabs/Chapter1") as GameObject;
+
         print("脚本初始化");
         Sans.HP.OnValueChange += OnSansInjured;
     }
@@ -162,8 +169,13 @@ public class BattleManager : MonoBehaviour {
         battleView.gameObject.GetComponent<RectTransform>().DOSizeDelta(new Vector2(596.45f, 366.4f),0.5f);
         yield return new WaitForSeconds(0.5f);
 
+        // 生成关卡
+        GameObject chapter = Instantiate(Chapter1);
 
-        yield return null;
+        chapter.GetComponent<BoneMoveChapter>().boneSpeed = 0.18f;
+
+        yield return chapter.GetComponent<BoneMoveChapter>().WaitChapterOver();
+
     }
     IEnumerator _Main() {
         //yield return null;
