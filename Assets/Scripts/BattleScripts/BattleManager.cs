@@ -34,6 +34,7 @@ public class BattleManager : MonoBehaviour {
 
     // 关卡预制体
     private GameObject Chapter1;
+    private GameObject Chapter2;
 
     /// <summary>
     /// 初始化工作
@@ -42,6 +43,7 @@ public class BattleManager : MonoBehaviour {
 
         // 读取关卡预制体
         Chapter1 = Resources.Load("Prefabs/Chapter1") as GameObject;
+        Chapter2 = Resources.Load("Prefabs/Chapter1") as GameObject;
 
         print("脚本初始化");
         Sans.HP.OnValueChange += OnSansInjured;
@@ -170,11 +172,25 @@ public class BattleManager : MonoBehaviour {
         yield return new WaitForSeconds(0.5f);
 
         // 生成关卡
-        GameObject chapter = Instantiate(Chapter1);
+        switch (rounds) {
+            case 2:
+                GameObject chapter = Instantiate(Chapter2);
 
-        chapter.GetComponent<BoneMoveChapter>().boneSpeed = 0.18f;
 
-        yield return chapter.GetComponent<BoneMoveChapter>().WaitChapterOver();
+
+                yield return chapter.GetComponent<Chapter2>().WaitChapterOver();
+
+                break;
+            default:
+                chapter = Instantiate(Chapter1);
+
+                chapter.GetComponent<BoneMoveChapter>().boneSpeed = 0.18f;
+
+                yield return chapter.GetComponent<BoneMoveChapter>().WaitChapterOver();
+                break;
+        }
+
+        
 
     }
     IEnumerator _Main() {

@@ -18,7 +18,7 @@ public class PlayerTrigger : MonoBehaviour{
             time += Time.deltaTime;
             if (time > 0.02f) {
                 time = 0;
-            } else if (time < 0.02f){
+            } else if (time< 0.02f){
                 return;
             }
 
