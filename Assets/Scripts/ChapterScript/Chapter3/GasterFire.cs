@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
+
+/// <summary>
+/// 根据Gaster炮开炮的位置与角度放置Gaster炮
+/// </summary>
 public class GasterFire : MonoBehaviour, IChapter {
 
     // Gaster开炮的位置
@@ -55,10 +59,12 @@ public class GasterFire : MonoBehaviour, IChapter {
         audioManagement.Audios["gasterblast"].Play();
         yield return new WaitForSeconds(0.2f);
 
-        transform.DOBlendableMoveBy(-new Vector3(2,0,0)*(zAngle==0?1:-1),0.3f);
+        transform.DOBlendableMoveBy(-transform.right*2, 0.3f);
+        //transform.DOBlendableMoveBy(-new Vector3(2,0,0)*(zAngle==0?1:-1),0.3f);
         yield return new WaitForSeconds(0.4f);
 
         isOver = true;
+        //yield return WaitChapterOver();
     }
 
     public IEnumerator WaitChapterOver() {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Linq;
 
 public class Chapter3 : MonoBehaviour, IChapter {
 
@@ -13,10 +14,45 @@ public class Chapter3 : MonoBehaviour, IChapter {
 
     public GameObject Gaster;
 
+    // 砖块
+    public Transform Bricks;
+    // 砖块协程
+    public IEnumerator brcksCourtine;
+    // 砖块速度
+    public float bricksSpeed = 2f;
+
     // 龙骨炮出现次数
     public int GasterCount = 20;
+    // 龙骨炮出现间隔
+    public float GasterIntervalMin = 1f;
+    public float GasterIntervalMax = 1.5f;
 
     private bool isOver = false;
+
+    public IEnumerator BricksMove() {
+
+        Transform[] bricksChild = Bricks.GetComponentsInChildren<Transform>();
+
+        // 砖块重复移动
+        while (!isOver) {
+
+            foreach (Transform brick in bricksChild) {
+
+                if (brick == Bricks || !brick.name.Contains("brick")) continue;
+
+                brick.Translate(new Vector2(1,0)*Time.deltaTime*bricksSpeed);
+                if (brick.position.x > 2.8f) {
+                    brick.position = new Vector3(-2.7f,brick.position.y,brick.position.z);
+                }
+            }
+
+            yield return new WaitForSeconds(0.02f);
+        }
+    }
+
+    private void Start() {
+        StartCoroutine(BricksMove());
+    }
 
     public IEnumerator Main() {
         GameObject newGaster;
@@ -36,9 +72,11 @@ public class Chapter3 : MonoBehaviour, IChapter {
             //yield return newGaster.GetComponent<GasterFire>().WaitChapterOver();
 
             // 等待随机时间
-            yield return new WaitForSeconds(Random.Range(0.3f, 1f));
+            yield return new WaitForSeconds(Random.Range(GasterIntervalMin, GasterIntervalMax));
         }
         isOver = true;
+
+        yield return WaitChapterOver();
     }
 
     public IEnumerator WaitChapterOver() {
